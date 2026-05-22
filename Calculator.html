@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #222;
+  
+}
+.calculator {
+  width: 400px;
+  background: #333;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+.display {
+  width: 100%;
+  height: 60px;
+  background: #000;
+  color: #fff;
+  font-size: 24px;
+  text-align: right;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.button {
+  width: 100%;
+  height: 60px;
+  background: #555;
+  color: #fff;
+  font-size: 18px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.reset {
+  background: #f00;
+  color : white;
+}
+.del {
+  background: #ff0;
+  color : black;
+}
+
+.button:hover {
+  background: #777;
+}
+.zero {
+  grid-column: span 2;
+}
+.equal {
+    background: Orange;
+    color: white;
+}
+.equal:hover {
+    background: DarkOrange;
+}
+</style>
+<body>
+<div class="calculator">
+    <div class="display" id="display">0</div>
+    <div class="buttons">
+        <button class="button reset" onclick="display.innerText = '0'; currentOperation = null;">C</button>
+        <button class ="button del" onclick="display.innerText = display.innerText.slice(0, -1) || '0';">DEL</button>
+        <button class = "buttom %" onclick="chooseOperation('%')">%</button>
+        <button class="button" onclick="chooseOperation('/')">/</button>
+        <button class="button" onclick="appendNumber('7')">7</button>
+        <button class="button" onclick="appendNumber('8')">8</button>
+        <button class="button" onclick="appendNumber('9')">9</button>
+        
+        <button class="button" onclick="chooseOperation('*')">*</button>
+        <button class="button" onclick="appendNumber('4')">4</button>
+        <button class="button" onclick="appendNumber('5')">5</button>
+        <button class="button" onclick="appendNumber('6')">6</button>
+        <button class="button" onclick="chooseOperation('-')">-</button>
+        <button class="button" onclick="appendNumber('1')">1</button>
+        <button class="button" onclick="appendNumber('2')">2</button>
+        <button class="button" onclick="appendNumber('3')">3</button>
+        <button class="button" onclick="chooseOperation('+')">+</button>
+        <button class="button zero" onclick="appendNumber('0')">0</button>
+        <button class="button" onclick="compute()">.</button>
+        <button class="button" onclick="compute()">=</button>
+    </div>
+</div>
+<script>
+const display = document.getElementById('display');
+function appendNumber(number) {
+    if (display.innerText === '0') {
+        display.innerText = number;
+    } else {
+        display.innerText += number;
+    }
+}
+
+let currentOperation = null;
+function chooseOperation(operation) {
+    if (currentOperation !== null) {
+        compute();
+    }
+    currentOperation = operation;
+    display.innerText += ` ${operation} `;
+}
+function compute() {
+    if (currentOperation === null) return;
+    const [operand1, operand2] = display.innerText.split(` ${currentOperation} `).map(Number);
+    let result;
+    switch (currentOperation) {
+        case '+':
+            result = operand1 + operand2;
+            break;
+        case '-':
+            result = operand1 - operand2;
+            break;
+        case '*':
+            result = operand1 * operand2;
+            break;
+        case '/':
+            result = operand1 / operand2;
+            break;
+    }
+    display.innerText = result.toString();
+    currentOperation = null;
+}
+function resetCalculator() {
+    display.innerText = '0';
+    currentOperation = null;
+}
+function deleteLast() {
+    display.innerText = display.innerText.slice(0, -1) || '0';
+}
+function percentage() {
+    const value = parseFloat(display.innerText);
+    if (!isNaN(value)) {
+        display.innerText = (value / 100).toString();
+    }
+}
+function handleButtonClick(value) {
+    if (value === 'C') {
+        resetCalculator();
+    } else if (value === 'DEL') {
+        deleteLast();
+    } else if (value === '%') {
+        percentage();
+    } else if (['+', '-', '*', '/'].includes(value)) {
+        chooseOperation(value);
+    } else if (value === '=') {
+        compute();
+    } else {
+        appendNumber(value);
+    }
+}
+function init() {
+    const buttons = document.querySelectorAll('.button');
+    buttons.forEach(button =>{
+        button.addEventListener('click', () => handleButtonClick(button.innerText));
+    });
+}
+function handleKeyPress(event) {
+    const key = event.key;
+    if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].includes(key)) {
+        appendNumber(key);
+    } else if (['+', '-', '*', '/'].includes(key)) {
+        chooseOperation(key);
+    } else if (key === 'Enter') {
+        compute();
+    } else if (key === 'Backspace') {
+        deleteLast();
+    } else if (key === '%') {
+        percentage();
+    } else if (key.toLowerCase() === 'c') {
+        resetCalculator();
+    }
+}
+function compute() {
+    try{
+        let expression = display.innerText;
+        expression = expression.replace('%','/100');
+        let result = eval(expression);
+        display.innerText = result;
+    } catch (error) {
+        display.innerText = 'Error';
+    }
+}
+    
+
+
+
+
+</script>
+
+
+  
+  
+  
+</body>
+</html>
+    
